@@ -7,7 +7,7 @@ import ejs from 'ejs';
 import bodyParser from 'body-parser';
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 // Function to get the formatted date
 function getFormattedDate() {
@@ -72,7 +72,6 @@ app.post('/add-task', (req, res) => {
   }
 });
 
-
 app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`)}
-);
+  console.log(`Server is running on port ${port}`);
+});
