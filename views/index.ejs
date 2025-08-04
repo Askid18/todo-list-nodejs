@@ -10,20 +10,23 @@
         <div class="form-section">
             <form action="/add-task" method="post">
                 <input type="text" name="newTask" placeholder="Add a new task" required>
-                <input type="hidden" name="list" value="Today">
+                <input type="hidden" name="list" value="<%= listName %>">
                 <button type="submit">Add</button>
             </form>
         </div>
     
-
         <div class="task-list">
             <h3><%= title %></h3>
             <ul>
                 <% tasks.forEach(function(task, index) { %>
+                    <form action="delete-task" method="post">
+                         
                     <li>
-                        <input type="checkbox" id="task-<%= index %>" class="task-checkbox">
-                        <label for="task-<%= index %>"><%= task %></label>
+                        <input type="checkbox" name="check" value="<%= task._id %>" id="task-<%= index %>" class="task-checkbox" onchange="this.form.submit()">
+                        <input type="hidden" name="list" value="<%= listName %>">
+                        <label for="task-<% index %>"><p><%= task.name %></p></label>
                     </li>
+                    </form>
                 <% }); %>
             </ul>
         </div>
