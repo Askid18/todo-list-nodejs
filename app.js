@@ -5,6 +5,8 @@
 import express from 'express';
 import ejs from 'ejs';
 import bodyParser from 'body-parser';
+import mongoose from 'mongoose';
+import _ from 'lodash';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -20,10 +22,29 @@ function getFormattedDate() {
   };
 }
 
+// Connect to database using mongoose
+await mongoose.connect('mongodb://localhost:27017/todoListDB')
+.then(() => {
+  console.log('Connected to MongoDB');
+}).catch(err => {
+  console.error('MongoDB connection error:', err);
+});
 
-// Initialize arrays to hold tasks for today and work
-let todayTasks = [];
-let workTasks = [];
+// Define a schema for tasks
+const taskSchema = new mongoose.Schema({
+  name: String
+});
+
+// Create a model for tasks
+const Task = mongoose.model('Task', taskSchema);
+
+// Define a schema for routes tasks
+const routeSchema = new mongoose.Schema({
+  name: String,
+  tasks: [taskSchema]
+});
+// Create a model for routes
+const Route = mongoose.model('Route', routeSchema);
 
 // Set up EJS as the templating engine and static files directory
 app.set('view engine', 'ejs');
@@ -33,42 +54,106 @@ app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Home route
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
   // get the formatted date
-  const { day, year } = getFormattedDate();  
-  res.render('index.ejs', {
+  const { day, year } = getFormattedDate();
+  // Fetch tasks for today from the database
+  const task = await Task.find({});
+  res.render('index', {
     title: 'Today\'s Tasks List', 
     thisDay: day,
     thisYear: year,
-    tasks: todayTasks 
+    tasks: task,
+    listName: 'Today'
   });
 });
 // handle form submission for home route
 
-//work route
-app.get('/work', (req, res) => {
-  // get the formatted date
+app.get('/:customListName', async (req, res) => {
+  const customListName = _.capitalize(req.params.customListName);
   const { day, year } = getFormattedDate();
-  // render the work page with tasks
-  res.render('work.ejs', { 
-    title: 'Work Tasks List',
+
+  // Check if the list exists
+  let foundList = await Route.findOne({ name: customListName });
+
+  // If not, create a new one
+  if (!foundList) {
+    foundList = new Route({
+      name: customListName,
+      tasks: []
+    });
+    await foundList.save();
+  }
+
+  // Render with tasks from the found or newly created list
+  res.render('index', {
+    title: `${customListName} Task's List`,
     thisDay: day,
     thisYear: year,
-    tasks: workTasks 
+    tasks: foundList.tasks,
+    listName: customListName
   });
 });
 
-// handle task submission for today and work route 
-app.post('/add-task', (req, res) => {
-  const task = req.body.newTask;
-  const list = req.body.list;
+app.get('/favicon.ico', (req, res) => res.status(204).end());
 
-  if (list === 'Work') {
-    workTasks.push(task);
-    res.redirect('/work');
-  } else {
-    todayTasks.push(task);
+// Dynamic route to handle adding tasks
+app.post('/add-task', async (req, res) => {
+  const taskName = req.body.newTask;
+  const listName = _.capitalize(req.body.list); // Get the list name from the form
+
+  console.log("Submitted Task:", taskName);
+  console.log("List name:", listName);  // <--- log this!
+  // Create a new task instance
+  const task = new Task({ name: taskName });
+  console.log(taskName, listName);
+
+
+  if (listName === "Today") {
+    await task.save();
     res.redirect('/');
+  } else {
+    const foundList = await Route.findOne({ name: listName });
+    if (foundList) {
+      foundList.tasks.push(task); // Embed task (not ref)
+      await foundList.save();
+      res.redirect('/' + listName);
+    } else {
+      console.error("List not found:", list);
+      res.redirect('/');
+    }
+  }
+});
+
+app.post('/delete-task', async (req, res) => {
+  const checkedTaskId = req.body.check;
+  const listName = req.body.list; // you must send this from the form
+
+  if (listName === "Today") {
+    // Task is in default Task collection
+    await Task.findByIdAndDelete(checkedTaskId)
+      .then(() => {
+        console.log("Task deleted from default list");
+        res.redirect('/');
+      })
+      .catch(err => {
+        console.error("Error deleting task:", err);
+        res.redirect('/');
+      });
+  } else {
+    // Task is inside a custom list
+    await Route.findOneAndUpdate(
+      { name: listName },
+      { $pull: { tasks: { _id: checkedTaskId } } }
+    )
+      .then(() => {
+        console.log(`Task deleted from ${listName} list`);
+        res.redirect('/' + listName);
+      })
+      .catch(err => {
+        console.error("Error deleting task from custom list:", err);
+        res.redirect('/');
+      });
   }
 });
 

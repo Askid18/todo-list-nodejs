@@ -18,12 +18,94 @@ body {
 }
 
 /* Header and footer */
-header, footer {
+footer {
   background-color: #007acc;
   color: white;
   padding: 1rem 2rem;
   text-align: center;
 }
+
+/* Base navbar styles */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #007acc; /* Your brand blue */
+  padding: 1rem;
+  position: relative;
+  color: white;
+}
+
+.logo a {
+  font-size: 1.5rem;
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+}
+
+.nav-links ul {
+  display: flex;
+  gap: 1.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* Toggle button (hamburger) */
+.toggle-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 2rem;
+  display: none;
+  cursor: pointer;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .toggle-btn {
+    display: block;
+  }
+
+  .nav-links {
+    position: absolute;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    background-color: #007acc;
+    display: none;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .nav-links.show {
+    display: flex;
+  }
+
+  .nav-links ul {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .nav-links li {
+    width: 100%;
+    padding: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .nav-links a {
+    width: 100%;
+  }
+}
+
 
 .material-symbols-outlined {
   height: 30px;
@@ -164,6 +246,7 @@ div h2 {
 .task-list ul {
   list-style: none;
   padding-left: 0;
+  font-size: 1.5rem;
 }
 
 .task-list li {

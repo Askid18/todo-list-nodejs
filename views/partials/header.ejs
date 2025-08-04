@@ -3,17 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/favicon.png" type="image/png">
     <title>To-Do List App</title>
     <link rel="stylesheet" href="/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 </head>
 <body>
     <%# This is the index.ejs file for the To-Do List App %>
-    <header>
-        <nav>
+    <header class="navbar">
+        <div class="logo">
+            <a href="/">MyTodo</a>
+        </div>
+
+        <button class="toggle-btn" id="menu-toggle">
+            <span class="material-symbols-outlined">menu</span>
+        </button>
+
+        <nav class="nav-links" id="nav-menu">
             <ul>
-                <li><a href="/"><span class="material-symbols-outlined">calendar_view_day</span>Today</a></li>
-                <li><a href="/work"><span class="material-symbols-outlined">work_update</span>Work</a></li>
+                <li><a href="/"><span class="material-symbols-outlined">calendar_view_day</span> Today</a></li>
+                <li><a href="/work"><span class="material-symbols-outlined">work_update</span> Work</a></li>
+                <li><a href="/school"><span class="material-symbols-outlined">school</span> School</a></li>
             </ul>
         </nav>
     </header>
