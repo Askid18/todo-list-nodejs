@@ -24,7 +24,7 @@ function getFormattedDate() {
 }
 
 // Connect to database using mongoose
-await mongoose.connect(process.env.MONGO_URI)
+await mongoose.connect(process.env.MONGODB_URI)
 .then(() => {
   console.log('Connected to MongoDB');
 }).catch(err => {
