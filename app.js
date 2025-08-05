@@ -23,7 +23,7 @@ function getFormattedDate() {
 }
 
 // Connect to database using mongoose
-await mongoose.connect('mongodb+srv://IamBidemi:GYpuVmJhXRr9dnqP@myfreecluster.7amqnl1.mongodb.net/todoListDB')
+await mongoose.connect(process.env.MONGO_URI)
 .then(() => {
   console.log('Connected to MongoDB');
 }).catch(err => {
