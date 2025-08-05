@@ -7,6 +7,7 @@ import ejs from 'ejs';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import _ from 'lodash';
+import dotenv from 'dotenv';
 
 const app = express();
 const port = process.env.PORT || 3000;
